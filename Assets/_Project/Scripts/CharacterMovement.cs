@@ -25,13 +25,16 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
     [SerializeField] private float jumpCutMultiplier = 0.4f;
 
     [Tooltip("Force appliquée pour la descente rapide")]
-    [SerializeField] private float fastFallForce = 10f;
+    [SerializeField] private float fastFallForce = 7f;
 
     [Tooltip("Couche utilisée pour détecter le sol")]
     [SerializeField] private LayerMask groundLayer;
 
     [Tooltip("Distance du raycast pour vérifier si le personnage touche le sol")]
     [SerializeField] private float groundCheckDistance = 0.1f;
+
+    [Tooltip("Distance horizontale pour vérifier les collisions latérales")]
+    [SerializeField] private float sideCheckDistance = 0.05f;
 
     // Variables privées
     private PlayerInputActions inputActions;
@@ -50,10 +53,7 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
     /// </summary>
     private void Awake()
     {
-        // Initialiser le système d'input
         inputActions = new PlayerInputActions();
-
-        // Vérifier le Rigidbody2D
         if (rb == null)
         {
             rb = GetComponent<Rigidbody2D>();
@@ -92,7 +92,7 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
     }
 
     /// <summary>
-    /// Vérifie si le personnage est en contact avec le sol en utilisant plusieurs raycasts.
+    /// Vérifie si le personnage est en contact avec le sol ou un bloc latéral.
     /// </summary>
     private void CheckGrounded()
     {
@@ -103,37 +103,34 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
             return;
         }
 
-        // Calculer les positions des raycasts (gauche, centre, droite du collider)
         Vector2 bottomCenter = new Vector2(transform.position.x, transform.position.y - collider.bounds.extents.y);
         Vector2 bottomLeft = bottomCenter - new Vector2(collider.bounds.extents.x * 0.8f, 0);
         Vector2 bottomRight = bottomCenter + new Vector2(collider.bounds.extents.x * 0.8f, 0);
 
-        // Lancer trois raycasts pour une détection plus robuste
         RaycastHit2D hitCenter = Physics2D.Raycast(bottomCenter, Vector2.down, groundCheckDistance, groundLayer);
         RaycastHit2D hitLeft = Physics2D.Raycast(bottomLeft, Vector2.down, groundCheckDistance, groundLayer);
         RaycastHit2D hitRight = Physics2D.Raycast(bottomRight, Vector2.down, groundCheckDistance, groundLayer);
 
-        // Le personnage est au sol si au moins un raycast touche le sol
         isGrounded = hitCenter.collider != null || hitLeft.collider != null || hitRight.collider != null;
 
-        // Débogage conditionnel
+        // Vérifier les collisions latérales
+        RaycastHit2D hitSideLeft = Physics2D.Raycast(bottomCenter, Vector2.left, sideCheckDistance, groundLayer);
+        RaycastHit2D hitSideRight = Physics2D.Raycast(bottomCenter, Vector2.right, sideCheckDistance, groundLayer);
+        bool isAgainstWall = hitSideLeft.collider != null || hitSideRight.collider != null;
+
         if (debugGroundCheck)
         {
-            Debug.Log($"isGrounded: {isGrounded}, hitCenter: {(hitCenter.collider != null ? hitCenter.collider.name : "null")}");
+            Debug.Log($"isGrounded: {isGrounded}, isAgainstWall: {isAgainstWall}, hitCenter: {(hitCenter.collider != null ? hitCenter.collider.name : "null")}");
         }
 
-        // Dessiner les raycasts pour le débogage visuel
         Color rayColor = isGrounded ? Color.green : Color.red;
         Debug.DrawRay(bottomCenter, Vector2.down * groundCheckDistance, rayColor);
         Debug.DrawRay(bottomLeft, Vector2.down * groundCheckDistance, rayColor);
         Debug.DrawRay(bottomRight, Vector2.down * groundCheckDistance, rayColor);
+        Debug.DrawRay(bottomCenter, Vector2.left * sideCheckDistance, isAgainstWall ? Color.yellow : Color.white);
+        Debug.DrawRay(bottomCenter, Vector2.right * sideCheckDistance, isAgainstWall ? Color.yellow : Color.white);
 
-        // Dessiner une ligne jaune au bas du collider
-        Debug.DrawLine(
-            new Vector3(bottomLeft.x, bottomLeft.y, 0),
-            new Vector3(bottomRight.x, bottomRight.y, 0),
-            Color.yellow
-        );
+        Debug.DrawLine(bottomLeft, bottomRight, Color.yellow);
     }
 
     /// <summary>
@@ -143,9 +140,22 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
     {
         currentSpeed = moveSpeed * (isSprinting ? sprintMultiplier : 1f);
         Vector2 velocity = new Vector2(moveInput.x * currentSpeed, rb.linearVelocity.y);
+
+        // Vérifier les collisions latérales
+        Collider2D collider = GetComponent<Collider2D>();
+        Vector2 bottomCenter = new Vector2(transform.position.x, transform.position.y - collider.bounds.extents.y);
+        RaycastHit2D hitSideLeft = Physics2D.Raycast(bottomCenter, Vector2.left, sideCheckDistance, groundLayer);
+        RaycastHit2D hitSideRight = Physics2D.Raycast(bottomCenter, Vector2.right, sideCheckDistance, groundLayer);
+        bool isAgainstWall = hitSideLeft.collider != null || hitSideRight.collider != null;
+
+        // Si contre un mur et en l'air, arrêter le mouvement horizontal pour forcer la chute
+        if (isAgainstWall && !isGrounded && Mathf.Abs(moveInput.x) > 0)
+        {
+            velocity.x = 0; // Arrêter le mouvement horizontal
+        }
+
         rb.linearVelocity = velocity;
 
-        // Retourner le sprite en fonction de la direction
         if (moveInput.x != 0)
         {
             transform.localScale = new Vector3(Mathf.Sign(moveInput.x), 1, 1);
@@ -159,7 +169,6 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
     {
         if (isFastFalling && !isGrounded)
         {
-            // Appliquer une force vers le bas
             rb.AddForce(Vector2.down * fastFallForce, ForceMode2D.Force);
         }
     }
@@ -191,7 +200,6 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
         }
         else if (context.canceled && !isGrounded && rb.linearVelocity.y > 0)
         {
-            // Réduire la vélocité verticale pour un saut à hauteur variable
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * jumpCutMultiplier);
         }
     }
@@ -206,7 +214,6 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
         isFastFalling = context.performed && !isGrounded;
     }
 
-    // Méthodes inutilisées de l'interface
     public void OnLook(InputAction.CallbackContext context) { }
     public void OnAttack(InputAction.CallbackContext context) { }
     public void OnInteract(InputAction.CallbackContext context) { }
