@@ -11,6 +11,9 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
     [Tooltip("Référence au composant Rigidbody2D du personnage")]
     [SerializeField] private Rigidbody2D rb;
 
+    [Tooltip("Référence au composant Animator du personnage")]
+    [SerializeField] private Animator animator;
+
     [Header("Paramètres de Mouvement")]
     [Tooltip("Vitesse de déplacement normale du personnage")]
     [SerializeField] private float moveSpeed = 5f;
@@ -31,10 +34,13 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
     [SerializeField] private LayerMask groundLayer;
 
     [Tooltip("Distance du raycast pour vérifier si le personnage touche le sol")]
-    [SerializeField] private float groundCheckDistance = 0.1f;
+    [SerializeField] private float groundCheckDistance = 0.15f;
 
     [Tooltip("Distance horizontale pour vérifier les collisions latérales")]
     [SerializeField] private float sideCheckDistance = 0.05f;
+
+    [Tooltip("Délai après un saut pendant lequel on ignore la détection du sol")]
+    [SerializeField] private float jumpGraceTime = 0.1f;
 
     // Variables privées
     private PlayerInputActions inputActions;
@@ -43,6 +49,8 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
     private bool isGrounded;
     private bool isFastFalling;
     private float currentSpeed;
+    private float lastJumpTime; // Pour suivre le moment du dernier saut
+    private bool ignoreGroundCheck; // Pour ignorer temporairement la détection du sol
 
     [Header("Debug")]
     [Tooltip("Activer les logs de débogage pour la détection du sol")]
@@ -60,6 +68,14 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
             if (rb == null)
             {
                 Debug.LogError("Aucun Rigidbody2D trouvé sur le personnage. Veuillez en ajouter un.");
+            }
+        }
+        if (animator == null)
+        {
+            animator = GetComponent<Animator>();
+            if (animator == null)
+            {
+                Debug.LogError("Aucun Animator trouvé sur le personnage. Veuillez en ajouter un.");
             }
         }
     }
@@ -103,6 +119,18 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
             return;
         }
 
+        // Vérifier si on doit ignorer la détection du sol
+        if (ignoreGroundCheck && Time.time - lastJumpTime < jumpGraceTime)
+        {
+            isGrounded = false; // Forcer isGrounded à false pendant le délai de grâce
+            animator.SetBool("isGrounded", isGrounded);
+            return;
+        }
+        else
+        {
+            ignoreGroundCheck = false; // Réactiver la détection après le délai
+        }
+
         Vector2 bottomCenter = new Vector2(transform.position.x, transform.position.y - collider.bounds.extents.y);
         Vector2 bottomLeft = bottomCenter - new Vector2(collider.bounds.extents.x * 0.8f, 0);
         Vector2 bottomRight = bottomCenter + new Vector2(collider.bounds.extents.x * 0.8f, 0);
@@ -131,6 +159,15 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
         Debug.DrawRay(bottomCenter, Vector2.right * sideCheckDistance, isAgainstWall ? Color.yellow : Color.white);
 
         Debug.DrawLine(bottomLeft, bottomRight, Color.yellow);
+
+        // Mettre à jour l'état d'animation
+        animator.SetBool("isGrounded", isGrounded);
+
+        // Réinitialiser isJumping lorsque le personnage est au sol
+        if (isGrounded)
+        {
+            animator.SetBool("isJumping", false);
+        }
     }
 
     /// <summary>
@@ -155,6 +192,10 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
         }
 
         rb.linearVelocity = velocity;
+
+        // Mettre à jour l'état d'animation pour la course
+        bool isMoving = Mathf.Abs(moveInput.x) > 0;
+        animator.SetBool("isRunning", isMoving);
 
         if (moveInput.x != 0)
         {
@@ -182,6 +223,9 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+            animator.SetBool("isJumping", true);
+            lastJumpTime = Time.time; // Enregistrer le moment du saut
+            ignoreGroundCheck = true; // Ignorer la détection du sol temporairement
         }
     }
 
