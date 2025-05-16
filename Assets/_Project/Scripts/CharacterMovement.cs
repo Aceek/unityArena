@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 /// <summary>
 /// Gère le mouvement du personnage en utilisant le nouveau système d'input d'Unity.
-/// Ce script permet au personnage de se déplacer horizontalement, sauter et sprinter.
+/// Permet le déplacement horizontal, le saut à hauteur variable, le sprint et la descente rapide.
 /// </summary>
 public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerActions
 {
@@ -21,6 +21,12 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
     [Tooltip("Force appliquée lors du saut")]
     [SerializeField] private float jumpForce = 10f;
 
+    [Tooltip("Multiplicateur pour réduire la hauteur du saut si la touche est relâchée")]
+    [SerializeField] private float jumpCutMultiplier = 0.4f;
+
+    [Tooltip("Force appliquée pour la descente rapide")]
+    [SerializeField] private float fastFallForce = 10f;
+
     [Tooltip("Couche utilisée pour détecter le sol")]
     [SerializeField] private LayerMask groundLayer;
 
@@ -32,7 +38,12 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
     private Vector2 moveInput;
     private bool isSprinting;
     private bool isGrounded;
+    private bool isFastFalling;
     private float currentSpeed;
+
+    [Header("Debug")]
+    [Tooltip("Activer les logs de débogage pour la détection du sol")]
+    [SerializeField] private bool debugGroundCheck = false;
 
     /// <summary>
     /// Initialise les composants et le système d'input.
@@ -42,7 +53,7 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
         // Initialiser le système d'input
         inputActions = new PlayerInputActions();
 
-        // Si le Rigidbody2D n'est pas assigné, essayer de le récupérer automatiquement
+        // Vérifier le Rigidbody2D
         if (rb == null)
         {
             rb = GetComponent<Rigidbody2D>();
@@ -58,10 +69,7 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
     /// </summary>
     private void OnEnable()
     {
-        // Enregistrer cette classe pour recevoir les callbacks d'input
         inputActions.Player.SetCallbacks(this);
-
-        // Activer la map d'actions "Player"
         inputActions.Player.Enable();
     }
 
@@ -70,7 +78,6 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
     /// </summary>
     private void OnDisable()
     {
-        // Désactiver la map d'actions "Player"
         inputActions.Player.Disable();
     }
 
@@ -79,53 +86,52 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
     /// </summary>
     private void FixedUpdate()
     {
-        // Vérifier si le personnage est au sol
         CheckGrounded();
-
-        // Appliquer le mouvement horizontal
         Move();
+        ApplyFastFall();
     }
 
     /// <summary>
-    /// Vérifie si le personnage est en contact avec le sol.
+    /// Vérifie si le personnage est en contact avec le sol en utilisant plusieurs raycasts.
     /// </summary>
     private void CheckGrounded()
     {
-        // Obtenir le Collider2D du personnage (si présent)
         Collider2D collider = GetComponent<Collider2D>();
         if (collider == null)
         {
             Debug.LogError("Aucun Collider2D trouvé sur le personnage!");
             return;
         }
-        
-        // Calculer la position du bas du collider
-        Vector2 bottomPosition = new Vector2(
-            transform.position.x,
-            transform.position.y - collider.bounds.extents.y
-        );
-        
-        // Lancer un raycast depuis le bas du collider vers le bas pour détecter le sol
-        RaycastHit2D hit = Physics2D.Raycast(
-            bottomPosition,  // Partir du bas du collider
-            Vector2.down,
-            groundCheckDistance,
-            groundLayer
-        );
-        
-        // Mettre à jour l'état "au sol"
-        isGrounded = hit.collider != null;
-        
-        // Afficher l'état de détection du sol dans la console
-        Debug.Log($"isGrounded: {isGrounded}, hit: {(hit.collider != null ? hit.collider.name : "null")}, position: {bottomPosition}");
-        
-        // Dessiner le raycast pour le débogage visuel
-        Debug.DrawRay(bottomPosition, Vector2.down * groundCheckDistance, isGrounded ? Color.green : Color.red);
-        
-        // Dessiner une ligne jaune au bas du collider pour visualisation
+
+        // Calculer les positions des raycasts (gauche, centre, droite du collider)
+        Vector2 bottomCenter = new Vector2(transform.position.x, transform.position.y - collider.bounds.extents.y);
+        Vector2 bottomLeft = bottomCenter - new Vector2(collider.bounds.extents.x * 0.8f, 0);
+        Vector2 bottomRight = bottomCenter + new Vector2(collider.bounds.extents.x * 0.8f, 0);
+
+        // Lancer trois raycasts pour une détection plus robuste
+        RaycastHit2D hitCenter = Physics2D.Raycast(bottomCenter, Vector2.down, groundCheckDistance, groundLayer);
+        RaycastHit2D hitLeft = Physics2D.Raycast(bottomLeft, Vector2.down, groundCheckDistance, groundLayer);
+        RaycastHit2D hitRight = Physics2D.Raycast(bottomRight, Vector2.down, groundCheckDistance, groundLayer);
+
+        // Le personnage est au sol si au moins un raycast touche le sol
+        isGrounded = hitCenter.collider != null || hitLeft.collider != null || hitRight.collider != null;
+
+        // Débogage conditionnel
+        if (debugGroundCheck)
+        {
+            Debug.Log($"isGrounded: {isGrounded}, hitCenter: {(hitCenter.collider != null ? hitCenter.collider.name : "null")}");
+        }
+
+        // Dessiner les raycasts pour le débogage visuel
+        Color rayColor = isGrounded ? Color.green : Color.red;
+        Debug.DrawRay(bottomCenter, Vector2.down * groundCheckDistance, rayColor);
+        Debug.DrawRay(bottomLeft, Vector2.down * groundCheckDistance, rayColor);
+        Debug.DrawRay(bottomRight, Vector2.down * groundCheckDistance, rayColor);
+
+        // Dessiner une ligne jaune au bas du collider
         Debug.DrawLine(
-            new Vector3(bottomPosition.x - collider.bounds.extents.x, bottomPosition.y, 0),
-            new Vector3(bottomPosition.x + collider.bounds.extents.x, bottomPosition.y, 0),
+            new Vector3(bottomLeft.x, bottomLeft.y, 0),
+            new Vector3(bottomRight.x, bottomRight.y, 0),
             Color.yellow
         );
     }
@@ -135,19 +141,26 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
     /// </summary>
     private void Move()
     {
-        // Calculer la vitesse actuelle en fonction du sprint
         currentSpeed = moveSpeed * (isSprinting ? sprintMultiplier : 1f);
-
-        // Créer le vecteur de vélocité
         Vector2 velocity = new Vector2(moveInput.x * currentSpeed, rb.linearVelocity.y);
-        
-        // Appliquer la vélocité au Rigidbody2D
         rb.linearVelocity = velocity;
 
-        // Retourner le sprite en fonction de la direction (si nécessaire)
+        // Retourner le sprite en fonction de la direction
         if (moveInput.x != 0)
         {
             transform.localScale = new Vector3(Mathf.Sign(moveInput.x), 1, 1);
+        }
+    }
+
+    /// <summary>
+    /// Applique la descente rapide si active.
+    /// </summary>
+    private void ApplyFastFall()
+    {
+        if (isFastFalling && !isGrounded)
+        {
+            // Appliquer une force vers le bas
+            rb.AddForce(Vector2.down * fastFallForce, ForceMode2D.Force);
         }
     }
 
@@ -158,53 +171,42 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
     {
         if (isGrounded)
         {
-            // Appliquer une force vers le haut pour sauter
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f); // Réinitialiser la vélocité verticale
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         }
     }
 
     #region Callbacks d'Input
 
-    /// <summary>
-    /// Callback appelé lorsque l'action Move est déclenchée.
-    /// </summary>
     public void OnMove(InputAction.CallbackContext context)
     {
-        // Lire la valeur de l'input de mouvement (Vector2)
         moveInput = context.ReadValue<Vector2>();
     }
 
-    /// <summary>
-    /// Callback appelé lorsque l'action Jump est déclenchée.
-    /// </summary>
     public void OnJump(InputAction.CallbackContext context)
     {
-        // Vérifier si le bouton vient d'être pressé
         if (context.performed)
         {
             Jump();
         }
+        else if (context.canceled && !isGrounded && rb.linearVelocity.y > 0)
+        {
+            // Réduire la vélocité verticale pour un saut à hauteur variable
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * jumpCutMultiplier);
+        }
     }
 
-    /// <summary>
-    /// Callback appelé lorsque l'action Sprint est déclenchée.
-    /// </summary>
     public void OnSprint(InputAction.CallbackContext context)
     {
-        // Mettre à jour l'état du sprint
-        if (context.performed)
-        {
-            isSprinting = true;
-        }
-        else if (context.canceled)
-        {
-            isSprinting = false;
-        }
+        isSprinting = context.performed;
     }
 
-    // Implémentation des autres méthodes de l'interface IPlayerActions
-    // Ces méthodes sont requises par l'interface mais ne sont pas utilisées dans ce script
+    public void OnFastFall(InputAction.CallbackContext context)
+    {
+        isFastFalling = context.performed && !isGrounded;
+    }
+
+    // Méthodes inutilisées de l'interface
     public void OnLook(InputAction.CallbackContext context) { }
     public void OnAttack(InputAction.CallbackContext context) { }
     public void OnInteract(InputAction.CallbackContext context) { }
