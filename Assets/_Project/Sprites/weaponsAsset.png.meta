@@ -1,0 +1,624 @@
+fileFormatVersion: 2
+guid: 1dd058018c4194147abbd8b02b53e9ff
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1731683439399558322
+    second: openart-image_4kX00ad2_1747676407948_raw-Photoroom_0
+  - first:
+      213: -4191451234202527953
+    second: openart-image_4kX00ad2_1747676407948_raw-Photoroom_1
+  - first:
+      213: -6547017174103901871
+    second: openart-image_4kX00ad2_1747676407948_raw-Photoroom_2
+  - first:
+      213: -3859305312448365906
+    second: openart-image_4kX00ad2_1747676407948_raw-Photoroom_3
+  - first:
+      213: -3953338151198001689
+    second: openart-image_4kX00ad2_1747676407948_raw-Photoroom_4
+  - first:
+      213: 4602831223084978474
+    second: openart-image_4kX00ad2_1747676407948_raw-Photoroom_5
+  - first:
+      213: 1356440773889659973
+    second: openart-image_4kX00ad2_1747676407948_raw-Photoroom_6
+  - first:
+      213: -487317275058183310
+    second: openart-image_4kX00ad2_1747676407948_raw-Photoroom_7
+  - first:
+      213: -8901121025125756995
+    second: openart-image_4kX00ad2_1747676407948_raw-Photoroom_8
+  - first:
+      213: -5112615845514488595
+    second: openart-image_4kX00ad2_1747676407948_raw-Photoroom_9
+  - first:
+      213: 6111020734628349384
+    second: openart-image_4kX00ad2_1747676407948_raw-Photoroom_10
+  - first:
+      213: 5548537371517239045
+    second: openart-image_4kX00ad2_1747676407948_raw-Photoroom_11
+  - first:
+      213: 6848174972352522257
+    second: openart-image_4kX00ad2_1747676407948_raw-Photoroom_12
+  - first:
+      213: -2883301828410439883
+    second: openart-image_4kX00ad2_1747676407948_raw-Photoroom_13
+  - first:
+      213: -387321171128030391
+    second: openart-image_4kX00ad2_1747676407948_raw-Photoroom_14
+  - first:
+      213: 1202779978705543583
+    second: openart-image_4kX00ad2_1747676407948_raw-Photoroom_15
+  - first:
+      213: 176470560960129142
+    second: openart-image_4kX00ad2_1747676407948_raw-Photoroom_16
+  - first:
+      213: -5608831116104769442
+    second: openart-image_4kX00ad2_1747676407948_raw-Photoroom_17
+  - first:
+      213: -829171476714496787
+    second: openart-image_4kX00ad2_1747676407948_raw-Photoroom_18
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: openart-image_4kX00ad2_1747676407948_raw-Photoroom_0
+      rect:
+        serializedVersion: 2
+        x: 45
+        y: 646
+        width: 94
+        height: 326
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e43a9233613d7f7e0800000000000000
+      internalID: -1731683439399558322
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: openart-image_4kX00ad2_1747676407948_raw-Photoroom_1
+      rect:
+        serializedVersion: 2
+        x: 156
+        y: 606
+        width: 159
+        height: 365
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f275cfb4f49f4d5c0800000000000000
+      internalID: -4191451234202527953
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: openart-image_4kX00ad2_1747676407948_raw-Photoroom_2
+      rect:
+        serializedVersion: 2
+        x: 285
+        y: 590
+        width: 86
+        height: 253
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 159b72751925425a0800000000000000
+      internalID: -6547017174103901871
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: openart-image_4kX00ad2_1747676407948_raw-Photoroom_3
+      rect:
+        serializedVersion: 2
+        x: 397
+        y: 598
+        width: 150
+        height: 382
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eaabcbb044ef07ac0800000000000000
+      internalID: -3859305312448365906
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: openart-image_4kX00ad2_1747676407948_raw-Photoroom_4
+      rect:
+        serializedVersion: 2
+        x: 574
+        y: 590
+        width: 117
+        height: 397
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e5f7dca5ebe229c0800000000000000
+      internalID: -3953338151198001689
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: openart-image_4kX00ad2_1747676407948_raw-Photoroom_5
+      rect:
+        serializedVersion: 2
+        x: 709
+        y: 614
+        width: 102
+        height: 286
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a219e0d4c9a80ef30800000000000000
+      internalID: 4602831223084978474
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: openart-image_4kX00ad2_1747676407948_raw-Photoroom_6
+      rect:
+        serializedVersion: 2
+        x: 837
+        y: 783
+        width: 142
+        height: 173
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5449c8672bb03d210800000000000000
+      internalID: 1356440773889659973
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: openart-image_4kX00ad2_1747676407948_raw-Photoroom_7
+      rect:
+        serializedVersion: 2
+        x: 45
+        y: 398
+        width: 85
+        height: 206
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 273ee3f2583bc39f0800000000000000
+      internalID: -487317275058183310
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: openart-image_4kX00ad2_1747676407948_raw-Photoroom_8
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 414
+        width: 188
+        height: 165
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dbf4e9a769dd87480800000000000000
+      internalID: -8901121025125756995
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: openart-image_4kX00ad2_1747676407948_raw-Photoroom_9
+      rect:
+        serializedVersion: 2
+        x: 430
+        y: 407
+        width: 165
+        height: 164
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: de4531fe9f65c09b0800000000000000
+      internalID: -5112615845514488595
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: openart-image_4kX00ad2_1747676407948_raw-Photoroom_10
+      rect:
+        serializedVersion: 2
+        x: 667
+        y: 375
+        width: 232
+        height: 213
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c5c1960bf4bec450800000000000000
+      internalID: 6111020734628349384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: openart-image_4kX00ad2_1747676407948_raw-Photoroom_11
+      rect:
+        serializedVersion: 2
+        x: 838
+        y: 478
+        width: 134
+        height: 262
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 50fb34c875d500d40800000000000000
+      internalID: 5548537371517239045
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: openart-image_4kX00ad2_1747676407948_raw-Photoroom_12
+      rect:
+        serializedVersion: 2
+        x: 45
+        y: 37
+        width: 85
+        height: 334
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 118eacaaada990f50800000000000000
+      internalID: 6848174972352522257
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: openart-image_4kX00ad2_1747676407948_raw-Photoroom_13
+      rect:
+        serializedVersion: 2
+        x: 157
+        y: 37
+        width: 134
+        height: 334
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5378c5173447cf7d0800000000000000
+      internalID: -2883301828410439883
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: openart-image_4kX00ad2_1747676407948_raw-Photoroom_14
+      rect:
+        serializedVersion: 2
+        x: 301
+        y: 38
+        width: 102
+        height: 334
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 94becec6275ff9af0800000000000000
+      internalID: -387321171128030391
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: openart-image_4kX00ad2_1747676407948_raw-Photoroom_15
+      rect:
+        serializedVersion: 2
+        x: 437
+        y: 38
+        width: 150
+        height: 342
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f9122bd940221b010800000000000000
+      internalID: 1202779978705543583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: openart-image_4kX00ad2_1747676407948_raw-Photoroom_16
+      rect:
+        serializedVersion: 2
+        x: 621
+        y: 37
+        width: 101
+        height: 326
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 678a75b4a03f27200800000000000000
+      internalID: 176470560960129142
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: openart-image_4kX00ad2_1747676407948_raw-Photoroom_17
+      rect:
+        serializedVersion: 2
+        x: 782
+        y: 54
+        width: 101
+        height: 292
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e50ea6711dd6922b0800000000000000
+      internalID: -5608831116104769442
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: openart-image_4kX00ad2_1747676407948_raw-Photoroom_18
+      rect:
+        serializedVersion: 2
+        x: 926
+        y: 29
+        width: 53
+        height: 422
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: decdb806fe03e74f0800000000000000
+      internalID: -829171476714496787
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      openart-image_4kX00ad2_1747676407948_raw-Photoroom_0: -1731683439399558322
+      openart-image_4kX00ad2_1747676407948_raw-Photoroom_1: -4191451234202527953
+      openart-image_4kX00ad2_1747676407948_raw-Photoroom_10: 6111020734628349384
+      openart-image_4kX00ad2_1747676407948_raw-Photoroom_11: 5548537371517239045
+      openart-image_4kX00ad2_1747676407948_raw-Photoroom_12: 6848174972352522257
+      openart-image_4kX00ad2_1747676407948_raw-Photoroom_13: -2883301828410439883
+      openart-image_4kX00ad2_1747676407948_raw-Photoroom_14: -387321171128030391
+      openart-image_4kX00ad2_1747676407948_raw-Photoroom_15: 1202779978705543583
+      openart-image_4kX00ad2_1747676407948_raw-Photoroom_16: 176470560960129142
+      openart-image_4kX00ad2_1747676407948_raw-Photoroom_17: -5608831116104769442
+      openart-image_4kX00ad2_1747676407948_raw-Photoroom_18: -829171476714496787
+      openart-image_4kX00ad2_1747676407948_raw-Photoroom_2: -6547017174103901871
+      openart-image_4kX00ad2_1747676407948_raw-Photoroom_3: -3859305312448365906
+      openart-image_4kX00ad2_1747676407948_raw-Photoroom_4: -3953338151198001689
+      openart-image_4kX00ad2_1747676407948_raw-Photoroom_5: 4602831223084978474
+      openart-image_4kX00ad2_1747676407948_raw-Photoroom_6: 1356440773889659973
+      openart-image_4kX00ad2_1747676407948_raw-Photoroom_7: -487317275058183310
+      openart-image_4kX00ad2_1747676407948_raw-Photoroom_8: -8901121025125756995
+      openart-image_4kX00ad2_1747676407948_raw-Photoroom_9: -5112615845514488595
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
