@@ -2,7 +2,7 @@
     <Style src="WeaponUI.uss" />
     <ui:VisualElement name="weapon-ui-container" class="weapon-ui-container">
         <ui:VisualElement name="weapon-panel" class="weapon-panel">
-            <ui:VisualElement name="weapon-image" class="weapon-image" />
+            <!-- Image de l'arme temporairement supprimée -->
             <ui:Label text="Nom de l'arme" display-tooltip-when-elided="true" name="weapon-name-label" class="weapon-name-label" />
             <ui:VisualElement name="timer-container" class="timer-container">
                 <ui:ProgressBar value="100" name="timer-progress-bar" class="timer-progress-bar" />

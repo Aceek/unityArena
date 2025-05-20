@@ -17,7 +17,6 @@ public class WeaponUIToolkit : MonoBehaviour
     // Références aux éléments UI Toolkit
     private VisualElement root;
     private VisualElement weaponUIContainer;
-    private VisualElement weaponImage;
     private ProgressBar timerProgressBar;
     private Label weaponNameLabel;
     private Label timerLabel;
@@ -93,7 +92,6 @@ public class WeaponUIToolkit : MonoBehaviour
         
         // Récupérer les références aux éléments d'UI
         weaponUIContainer = root.Q<VisualElement>("weapon-ui-container");
-        weaponImage = root.Q<VisualElement>("weapon-image");
         timerProgressBar = root.Q<ProgressBar>("timer-progress-bar");
         weaponNameLabel = root.Q<Label>("weapon-name-label");
         timerLabel = root.Q<Label>("timer-label");
@@ -120,12 +118,7 @@ public class WeaponUIToolkit : MonoBehaviour
             weaponUIContainer.style.display = DisplayStyle.Flex;
         }
         
-        // Mettre à jour l'image de l'arme
-        if (weaponImage != null && weaponData.weaponSprite != null)
-        {
-            // Convertir le Sprite en Texture2D pour UI Toolkit
-            weaponImage.style.backgroundImage = new StyleBackground(weaponData.weaponSprite.texture);
-        }
+        // Note: Nous n'affichons pas l'image de l'arme pour le moment
         
         // Mettre à jour le nom de l'arme
         if (weaponNameLabel != null)

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class WeaponUI : MonoBehaviour
+public class WeaponUICanvas : MonoBehaviour
 {
     [Header("Références")]
     [Tooltip("Référence au composant PlayerWeapon")]
@@ -35,7 +35,7 @@ public class WeaponUI : MonoBehaviour
             playerWeapon = FindFirstObjectByType<PlayerWeapon>();
             if (playerWeapon == null)
             {
-                Debug.LogError("[WeaponUI] Awake: Aucun PlayerWeapon trouvé ! Veuillez l'assigner manuellement.");
+                Debug.LogError("[WeaponUICanvas] Awake: Aucun PlayerWeapon trouvé ! Veuillez l'assigner manuellement.");
             }
         }
         

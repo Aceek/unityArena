@@ -13,6 +13,7 @@
     flex-direction: column;
 }
 
+/* Image de l'arme temporairement supprimée
 .weapon-image {
     width: 64px;
     height: 64px;
@@ -22,6 +23,7 @@
     border-radius: 5px;
     -unity-background-scale-mode: scale-to-fit;
 }
+*/
 
 .weapon-name-label {
     color: rgb(255, 255, 255);
