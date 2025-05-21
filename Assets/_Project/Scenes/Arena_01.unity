@@ -399,7 +399,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   distanceFromPlayer: 1
-  player: {fileID: 1911442225}
+  player: {fileID: 0}
 --- !u!212 &803848368
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -471,7 +471,7 @@ GameObject:
   - component: {fileID: 1084210101}
   m_Layer: 6
   m_Name: Tilemap
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5277,6 +5277,7 @@ MonoBehaviour:
   weaponSpriteRenderer: {fileID: 137968310}
   mainCamera: {fileID: 1772796437}
   weaponOffset: {x: 0.5, y: 0, z: 0}
+  projectileSpawnDistance: 0.3
   attackCooldown: 0.5
   attackAction: {fileID: 1120369429361536294, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   OnWeaponEquipped:

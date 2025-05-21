@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4461249365163711585}
   m_Layer: 0
   m_Name: Bullet
-  m_TagString: Untagged
+  m_TagString: WrapAround
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 23.2513, y: 18.28779, z: 0}
-  m_LocalScale: {x: 0.54038, y: 0.54038, z: 0.54038}
+  m_LocalScale: {x: 0.49261582, y: 0.49261582, z: 0.49261582}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -124,8 +124,8 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Radius: 0.76
+  m_Offset: {x: -0.019409727, y: 0.014554392}
+  m_Radius: 0.55139035
 --- !u!50 &5356101025442333966
 Rigidbody2D:
   serializedVersion: 5

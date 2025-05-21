@@ -6,6 +6,7 @@ TagManager:
   tags:
   - WrapAround
   - test
+  - Wall
   layers:
   - Default
   - TransparentFX

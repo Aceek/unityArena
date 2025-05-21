@@ -16,6 +16,9 @@ public class PlayerWeapon : MonoBehaviour
     [Tooltip("Position de l'arme par rapport au joueur")]
     [SerializeField] private Vector3 weaponOffset = new Vector3(0.5f, 0f, 0f);
     
+    [Tooltip("Distance supplémentaire pour le spawn du projectile afin d'éviter les collisions immédiates")]
+    [SerializeField] private float projectileSpawnDistance = 0.3f;
+    
     [Tooltip("Délai entre les attaques (en secondes)")]
     [Range(0.1f, 2f)]
     [SerializeField] private float attackCooldown = 0.5f;
@@ -237,8 +240,8 @@ public class PlayerWeapon : MonoBehaviour
             direction = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
         }
         
-        // Point de spawn du projectile
-        Vector3 spawnPosition = transform.position + weaponOffset;
+        // Calculer le point de spawn du projectile en fonction de la direction
+        Vector3 spawnPosition = transform.position + weaponOffset + (Vector3)(direction.normalized * projectileSpawnDistance);
         
         // Instancier le projectile
         GameObject projectile = Instantiate(equippedWeapon.projectilePrefab, spawnPosition, Quaternion.identity);
