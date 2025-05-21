@@ -2,8 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Gère le mouvement du personnage en utilisant le nouveau système d'input d'Unity.
-/// Permet le déplacement horizontal, le saut à hauteur variable, le sprint et la descente rapide.
+/// Gère le mouvement du personnage et la visée en utilisant le nouveau système d'input d'Unity.
 /// </summary>
 public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerActions
 {
@@ -45,20 +44,21 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
     // Variables privées
     private PlayerInputActions inputActions;
     private Vector2 moveInput;
+    private Vector2 lookInput; // Nouvelle variable pour la visée
     private bool isSprinting;
     private bool isGrounded;
     private bool isFastFalling;
     private float currentSpeed;
-    private float lastJumpTime; // Pour suivre le moment du dernier saut
-    private bool ignoreGroundCheck; // Pour ignorer temporairement la détection du sol
+    private float lastJumpTime;
+    private bool ignoreGroundCheck;
 
     [Header("Debug")]
     [Tooltip("Activer les logs de débogage pour la détection du sol")]
     [SerializeField] private bool debugGroundCheck = false;
 
-    /// <summary>
-    /// Initialise les composants et le système d'input.
-    /// </summary>
+    // Propriété publique pour accéder à la direction de visée
+    public Vector2 LookInput => lookInput;
+
     private void Awake()
     {
         inputActions = new PlayerInputActions();
@@ -80,26 +80,17 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
         }
     }
 
-    /// <summary>
-    /// Active les inputs et enregistre les callbacks.
-    /// </summary>
     private void OnEnable()
     {
         inputActions.Player.SetCallbacks(this);
         inputActions.Player.Enable();
     }
 
-    /// <summary>
-    /// Désactive les inputs et supprime les callbacks.
-    /// </summary>
     private void OnDisable()
     {
         inputActions.Player.Disable();
     }
 
-    /// <summary>
-    /// Mise à jour de la physique à intervalle fixe.
-    /// </summary>
     private void FixedUpdate()
     {
         CheckGrounded();
@@ -107,9 +98,6 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
         ApplyFastFall();
     }
 
-    /// <summary>
-    /// Vérifie si le personnage est en contact avec le sol ou un bloc latéral.
-    /// </summary>
     private void CheckGrounded()
     {
         Collider2D collider = GetComponent<Collider2D>();
@@ -119,16 +107,15 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
             return;
         }
 
-        // Vérifier si on doit ignorer la détection du sol
         if (ignoreGroundCheck && Time.time - lastJumpTime < jumpGraceTime)
         {
-            isGrounded = false; // Forcer isGrounded à false pendant le délai de grâce
+            isGrounded = false;
             animator.SetBool("isGrounded", isGrounded);
             return;
         }
         else
         {
-            ignoreGroundCheck = false; // Réactiver la détection après le délai
+            ignoreGroundCheck = false;
         }
 
         Vector2 bottomCenter = new Vector2(transform.position.x, transform.position.y - collider.bounds.extents.y);
@@ -141,7 +128,6 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
 
         isGrounded = hitCenter.collider != null || hitLeft.collider != null || hitRight.collider != null;
 
-        // Vérifier les collisions latérales
         RaycastHit2D hitSideLeft = Physics2D.Raycast(bottomCenter, Vector2.left, sideCheckDistance, groundLayer);
         RaycastHit2D hitSideRight = Physics2D.Raycast(bottomCenter, Vector2.right, sideCheckDistance, groundLayer);
         bool isAgainstWall = hitSideLeft.collider != null || hitSideRight.collider != null;
@@ -160,40 +146,32 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
 
         Debug.DrawLine(bottomLeft, bottomRight, Color.yellow);
 
-        // Mettre à jour l'état d'animation
         animator.SetBool("isGrounded", isGrounded);
 
-        // Réinitialiser isJumping lorsque le personnage est au sol
         if (isGrounded)
         {
             animator.SetBool("isJumping", false);
         }
     }
 
-    /// <summary>
-    /// Applique le mouvement horizontal au personnage.
-    /// </summary>
     private void Move()
     {
         currentSpeed = moveSpeed * (isSprinting ? sprintMultiplier : 1f);
         Vector2 velocity = new Vector2(moveInput.x * currentSpeed, rb.linearVelocity.y);
 
-        // Vérifier les collisions latérales
         Collider2D collider = GetComponent<Collider2D>();
         Vector2 bottomCenter = new Vector2(transform.position.x, transform.position.y - collider.bounds.extents.y);
         RaycastHit2D hitSideLeft = Physics2D.Raycast(bottomCenter, Vector2.left, sideCheckDistance, groundLayer);
         RaycastHit2D hitSideRight = Physics2D.Raycast(bottomCenter, Vector2.right, sideCheckDistance, groundLayer);
         bool isAgainstWall = hitSideLeft.collider != null || hitSideRight.collider != null;
 
-        // Si contre un mur et en l'air, arrêter le mouvement horizontal pour forcer la chute
         if (isAgainstWall && !isGrounded && Mathf.Abs(moveInput.x) > 0)
         {
-            velocity.x = 0; // Arrêter le mouvement horizontal
+            velocity.x = 0;
         }
 
         rb.linearVelocity = velocity;
 
-        // Mettre à jour l'état d'animation pour la course
         bool isMoving = Mathf.Abs(moveInput.x) > 0;
         animator.SetBool("isRunning", isMoving);
 
@@ -203,9 +181,6 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
         }
     }
 
-    /// <summary>
-    /// Applique la descente rapide si active.
-    /// </summary>
     private void ApplyFastFall()
     {
         if (isFastFalling && !isGrounded)
@@ -214,9 +189,6 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
         }
     }
 
-    /// <summary>
-    /// Fait sauter le personnage si celui-ci est au sol.
-    /// </summary>
     private void Jump()
     {
         if (isGrounded)
@@ -224,8 +196,8 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
             animator.SetBool("isJumping", true);
-            lastJumpTime = Time.time; // Enregistrer le moment du saut
-            ignoreGroundCheck = true; // Ignorer la détection du sol temporairement
+            lastJumpTime = Time.time;
+            ignoreGroundCheck = true;
         }
     }
 
@@ -258,7 +230,11 @@ public class CharacterMovement : MonoBehaviour, PlayerInputActions.IPlayerAction
         isFastFalling = context.performed && !isGrounded;
     }
 
-    public void OnLook(InputAction.CallbackContext context) { }
+    public void OnLook(InputAction.CallbackContext context)
+    {
+        lookInput = context.ReadValue<Vector2>();
+    }
+
     public void OnAttack(InputAction.CallbackContext context) { }
     public void OnInteract(InputAction.CallbackContext context) { }
     public void OnCrouch(InputAction.CallbackContext context) { }

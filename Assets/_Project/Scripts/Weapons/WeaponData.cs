@@ -33,9 +33,16 @@ public class WeaponData : ScriptableObject
     [Tooltip("Vitesse d'attaque (attaques par seconde)")]
     [Range(0.1f, 5f)]
     public float attackSpeed = 1f;
+    
+    [Header("Paramètres des armes à distance")]
+    [Tooltip("Prefab du projectile pour les armes à distance")]
+    public GameObject projectilePrefab;
+    
+    [Tooltip("Vitesse du projectile (en unités par seconde)")]
+    [Range(5f, 50f)]
+    public float projectileSpeed = 10f;
 }
 
-// Énumération pour les différents types d'armes
 public enum WeaponType
 {
     MeleeWeapon,    // Arme de corps à corps

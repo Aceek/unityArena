@@ -1,13 +1,16 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using UnityEngine.Events;
 
 public class PlayerWeapon : MonoBehaviour
 {
     [Header("Références")]
     [Tooltip("Référence au SpriteRenderer pour afficher l'arme équipée")]
     [SerializeField] private SpriteRenderer weaponSpriteRenderer;
+    
+    [Tooltip("Référence à la caméra principale pour la visée avec la souris")]
+    [SerializeField] private Camera mainCamera;
     
     [Header("Paramètres")]
     [Tooltip("Position de l'arme par rapport au joueur")]
@@ -47,23 +50,29 @@ public class PlayerWeapon : MonoBehaviour
         // Initialiser le SpriteRenderer de l'arme s'il n'est pas assigné
         if (weaponSpriteRenderer == null)
         {
-            // Créer un GameObject enfant pour l'arme si nécessaire
             GameObject weaponObject = new GameObject("EquippedWeapon");
             weaponObject.transform.SetParent(transform);
             weaponObject.transform.localPosition = weaponOffset;
             
-            // Ajouter un SpriteRenderer
             weaponSpriteRenderer = weaponObject.AddComponent<SpriteRenderer>();
-            weaponSpriteRenderer.sortingOrder = 1; // S'assurer que l'arme est au-dessus du joueur
+            weaponSpriteRenderer.sortingOrder = 1;
         }
         
-        // Désactiver le SpriteRenderer au départ (pas d'arme équipée)
         if (weaponSpriteRenderer != null)
         {
             weaponSpriteRenderer.enabled = false;
         }
         
-        // Activer l'action d'attaque si elle est assignée
+        // Trouver la caméra principale si non assignée
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+            if (mainCamera == null)
+            {
+                Debug.LogError("[PlayerWeapon] Awake: Aucune caméra principale trouvée !");
+            }
+        }
+        
         if (attackAction != null)
         {
             attackAction.action.Enable();
@@ -71,20 +80,18 @@ public class PlayerWeapon : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("[PlayerWeapon] Awake: Aucune action d'attaque assignée ! Veuillez assigner une InputActionReference.");
+            Debug.LogWarning("[PlayerWeapon] Awake: Aucune action d'attaque assignée !");
         }
     }
     
     private void OnDestroy()
     {
-        // Se désabonner de l'événement d'attaque
         if (attackAction != null)
         {
             attackAction.action.performed -= OnAttackPerformed;
         }
     }
     
-    // Méthode appelée lorsque l'action d'attaque est déclenchée
     private void OnAttackPerformed(InputAction.CallbackContext context)
     {
         if (HasWeapon && canAttack)
@@ -95,86 +102,65 @@ public class PlayerWeapon : MonoBehaviour
     
     private void Update()
     {
-        // Si le joueur a une arme équipée
         if (HasWeapon)
         {
-            // Mettre à jour le timer
             weaponTimer -= Time.deltaTime;
-            
-            // Notifier les observateurs (UI) du changement de timer
             OnWeaponTimerUpdated?.Invoke(weaponTimer);
             
-            // Vérifier si le timer est écoulé
             if (weaponTimer <= 0)
             {
                 UnequipWeapon();
             }
             
-            // Note: L'attaque est maintenant gérée par l'événement OnAttackPerformed
+            // Mettre à jour la rotation de l'arme pour suivre la visée
+            UpdateWeaponRotation();
         }
     }
     
-    // Équiper une nouvelle arme
     public void EquipWeapon(WeaponData weaponData)
     {
-        // Déséquiper l'arme actuelle si nécessaire
         if (HasWeapon)
         {
             UnequipWeapon();
         }
         
-        // Équiper la nouvelle arme
         equippedWeapon = weaponData;
         weaponTimer = weaponData.duration;
         
-        // Mettre à jour le sprite de l'arme
         if (weaponSpriteRenderer != null && weaponData.weaponSprite != null)
         {
             weaponSpriteRenderer.sprite = weaponData.weaponSprite;
             weaponSpriteRenderer.enabled = true;
         }
         
-        // Notifier les observateurs (UI) que l'arme a été équipée
         OnWeaponEquipped?.Invoke(weaponData);
         
         Debug.Log($"[PlayerWeapon] Arme '{weaponData.weaponName}' équipée pour {weaponData.duration} secondes");
     }
     
-    // Déséquiper l'arme actuelle
     public void UnequipWeapon()
     {
         if (HasWeapon)
         {
             Debug.Log($"[PlayerWeapon] Arme '{equippedWeapon.weaponName}' déséquipée");
-            
-            // Désactiver le sprite de l'arme
             if (weaponSpriteRenderer != null)
             {
                 weaponSpriteRenderer.enabled = false;
             }
-            
-            // Réinitialiser les données
             equippedWeapon = null;
             weaponTimer = 0;
-            
-            // Notifier les observateurs (UI) que l'arme a été déséquipée
             OnWeaponUnequipped?.Invoke();
         }
     }
     
-    // Effectuer une attaque avec l'arme équipée
     private void Attack()
     {
         if (!HasWeapon || !canAttack)
             return;
         
-        // Déclencher l'attaque
         Debug.Log($"[PlayerWeapon] Attaque avec '{equippedWeapon.weaponName}'");
-        
-        // Notifier les observateurs de l'attaque
         OnWeaponAttack?.Invoke();
         
-        // Implémenter la logique d'attaque selon le type d'arme
         switch (equippedWeapon.weaponType)
         {
             case WeaponType.MeleeWeapon:
@@ -182,21 +168,17 @@ public class PlayerWeapon : MonoBehaviour
                 break;
                 
             case WeaponType.RangedWeapon:
-                // À implémenter plus tard
-                Debug.Log("[PlayerWeapon] Attaque à distance non implémentée");
+                StartCoroutine(PerformRangedAttack());
                 break;
                 
             case WeaponType.SpecialWeapon:
-                // À implémenter plus tard
                 Debug.Log("[PlayerWeapon] Attaque spéciale non implémentée");
                 break;
         }
         
-        // Démarrer le cooldown d'attaque
         StartCoroutine(AttackCooldown());
     }
     
-    // Coroutine pour le cooldown entre les attaques
     private IEnumerator AttackCooldown()
     {
         canAttack = false;
@@ -204,56 +186,136 @@ public class PlayerWeapon : MonoBehaviour
         canAttack = true;
     }
     
-    // Coroutine pour effectuer une attaque de corps à corps
     private IEnumerator PerformMeleeAttack()
     {
-        // Animation simple pour l'attaque (rotation de l'arme)
         Quaternion originalRotation = weaponSpriteRenderer.transform.localRotation;
         float attackDuration = 0.2f;
         float elapsedTime = 0;
         
-        // Rotation de l'arme pour simuler un coup
         while (elapsedTime < attackDuration)
         {
             float rotationAngle = Mathf.Lerp(0, 90, elapsedTime / attackDuration);
             weaponSpriteRenderer.transform.localRotation = originalRotation * Quaternion.Euler(0, 0, rotationAngle);
-            
             elapsedTime += Time.deltaTime;
             yield return null;
         }
         
-        // Détecter les ennemis dans la portée d'attaque
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, equippedWeapon.attackRange);
         foreach (Collider2D hitCollider in hitColliders)
         {
-            // Vérifier si c'est un ennemi
-            // Note: À adapter selon votre système d'ennemis
             if (hitCollider.CompareTag("Enemy"))
             {
-                // Appliquer des dégâts à l'ennemi
-                // Note: À adapter selon votre système de dégâts
                 Debug.Log($"[PlayerWeapon] Ennemi touché avec {equippedWeapon.damage} dégâts");
-                
-                // Exemple: hitCollider.GetComponent<Enemy>().TakeDamage(equippedWeapon.damage);
             }
         }
         
-        // Retour à la rotation d'origine
         elapsedTime = 0;
         while (elapsedTime < attackDuration)
         {
             float rotationAngle = Mathf.Lerp(90, 0, elapsedTime / attackDuration);
             weaponSpriteRenderer.transform.localRotation = originalRotation * Quaternion.Euler(0, 0, rotationAngle);
-            
             elapsedTime += Time.deltaTime;
             yield return null;
         }
         
-        // S'assurer que l'arme revient exactement à sa rotation d'origine
         weaponSpriteRenderer.transform.localRotation = originalRotation;
     }
     
-    // Méthode pour dessiner la portée d'attaque dans l'éditeur (debug)
+    private IEnumerator PerformRangedAttack()
+    {
+        if (equippedWeapon.projectilePrefab == null)
+        {
+            Debug.LogError("[PlayerWeapon] PerformRangedAttack: Aucun prefab de projectile assigné !");
+            yield break;
+        }
+        
+        // Obtenir la direction de visée
+        Vector2 direction = GetAimDirection();
+        if (direction == Vector2.zero)
+        {
+            // Si aucune direction (ex. joystick non utilisé), utiliser l'orientation du joueur
+            direction = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
+        }
+        
+        // Point de spawn du projectile
+        Vector3 spawnPosition = transform.position + weaponOffset;
+        
+        // Instancier le projectile
+        GameObject projectile = Instantiate(equippedWeapon.projectilePrefab, spawnPosition, Quaternion.identity);
+        
+        // Initialiser le projectile
+        Projectile projectileScript = projectile.GetComponent<Projectile>();
+        if (projectileScript != null)
+        {
+            projectileScript.Initialize(direction, equippedWeapon.projectileSpeed, equippedWeapon.damage);
+        }
+        else
+        {
+            Debug.LogError("[PlayerWeapon] PerformRangedAttack: Le prefab de projectile n'a pas de composant Projectile !");
+            Destroy(projectile);
+        }
+        
+        // Animation de recul
+        Quaternion originalRotation = weaponSpriteRenderer.transform.localRotation;
+        float recoilDuration = 0.1f;
+        float elapsedTime = 0;
+        
+        while (elapsedTime < recoilDuration)
+        {
+            float recoilAngle = Mathf.Lerp(0, -10, elapsedTime / recoilDuration);
+            weaponSpriteRenderer.transform.localRotation = originalRotation * Quaternion.Euler(0, 0, recoilAngle);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        
+        elapsedTime = 0;
+        while (elapsedTime < recoilDuration)
+        {
+            float recoilAngle = Mathf.Lerp(-10, 0, elapsedTime / recoilDuration);
+            weaponSpriteRenderer.transform.localRotation = originalRotation * Quaternion.Euler(0, 0, recoilAngle);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        
+        weaponSpriteRenderer.transform.localRotation = originalRotation;
+    }
+    
+    private Vector2 GetAimDirection()
+    {
+        CharacterMovement movement = GetComponent<CharacterMovement>();
+        if (movement == null)
+        {
+            Debug.LogError("[PlayerWeapon] GetAimDirection: Aucun CharacterMovement trouvé !");
+            return Vector2.zero;
+        }
+        
+        Vector2 lookInput = movement.LookInput;
+        
+        // Si l'input est de la souris
+        if (Mouse.current != null && Mouse.current.position.ReadValue() != Vector2.zero)
+        {
+            Vector2 mousePosition = Mouse.current.position.ReadValue();
+            Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(mousePosition.x, mousePosition.y, mainCamera.nearClipPlane));
+            return (worldPosition - transform.position).normalized;
+        }
+        
+        // Sinon, utiliser l'input du joystick
+        return lookInput.normalized;
+    }
+    
+    private void UpdateWeaponRotation()
+    {
+        if (!HasWeapon || weaponSpriteRenderer == null)
+            return;
+            
+        Vector2 direction = GetAimDirection();
+        if (direction != Vector2.zero)
+        {
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            weaponSpriteRenderer.transform.localRotation = Quaternion.Euler(0, 0, angle);
+        }
+    }
+    
     private void OnDrawGizmosSelected()
     {
         if (HasWeapon)

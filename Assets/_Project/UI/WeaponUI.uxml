@@ -1,12 +1,11 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="WeaponUI.uss" />
+    <Style src="project://database/Assets/_Project/UI/WeaponUI.uss?fileID=7433441132597879392&amp;guid=10e277e9e2124e342b291c52ab8f358f&amp;type=3#WeaponUI" />
     <ui:VisualElement name="weapon-ui-container" class="weapon-ui-container">
         <ui:VisualElement name="weapon-panel" class="weapon-panel">
-            <!-- Image de l'arme temporairement supprimée -->
-            <ui:Label text="Nom de l'arme" display-tooltip-when-elided="true" name="weapon-name-label" class="weapon-name-label" />
+            <ui:Label text="Nom de l&apos;arme" display-tooltip-when-elided="true" name="weapon-name-label" class="weapon-name-label" style="height: 13px; width: 172px;" />
             <ui:VisualElement name="timer-container" class="timer-container">
-                <ui:ProgressBar value="100" name="timer-progress-bar" class="timer-progress-bar" />
-                <ui:Label text="00:10" display-tooltip-when-elided="true" name="timer-label" class="timer-label" />
+                <ui:ProgressBar value="100" name="timer-progress-bar" class="timer-progress-bar" style="height: 0; width: 172px;" />
+                <ui:Label text="00:10" display-tooltip-when-elided="true" name="timer-label" class="timer-label" style="height: 12px; width: 164px; -unity-text-align: middle-center;" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
