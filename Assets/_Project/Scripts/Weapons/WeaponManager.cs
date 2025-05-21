@@ -5,8 +5,8 @@ using UnityEngine;
 public class WeaponManager : MonoBehaviour
 {
     [Header("Références")]
-    [Tooltip("Référence au WrapAroundManager pour obtenir les dimensions de la map")]
-    [SerializeField] private WrapAroundManager wrapAroundManager;
+    [Tooltip("Liste des spawners d'armes dans la scène")]
+    [SerializeField] private List<WeaponSpawner> spawners;
     
     [Tooltip("Prefab de l'arme à spawner sur la map")]
     [SerializeField] private GameObject weaponPickupPrefab;
@@ -20,128 +20,100 @@ public class WeaponManager : MonoBehaviour
     [Range(1, 10)]
     [SerializeField] private int maxActiveWeapons = 3;
     
-    [Tooltip("Délai minimum entre les spawns d'armes (en secondes)")]
-    [Range(1f, 30f)]
-    [SerializeField] private float minSpawnDelay = 5f;
+    [Tooltip("Délai initial avant le premier spawn (en secondes)")]
+    [Range(0f, 5f)]
+    [SerializeField] private float initialSpawnDelay = 2f;
     
-    [Tooltip("Délai maximum entre les spawns d'armes (en secondes)")]
-    [Range(1f, 30f)]
-    [SerializeField] private float maxSpawnDelay = 15f;
-    
-    [Tooltip("Distance minimale de spawn par rapport aux bords de la map")]
-    [Range(0.5f, 5f)]
-    [SerializeField] private float borderOffset = 1f;
-    
-    // Liste des armes actuellement actives sur la map
     private List<GameObject> activeWeapons = new List<GameObject>();
     
-    // Propriété pour accéder au nombre d'armes actives
     public int ActiveWeaponsCount => activeWeapons.Count;
+    
+    private void Awake()
+    {
+        if (spawners == null || spawners.Count == 0)
+        {
+            Debug.LogError("[WeaponManager] Awake: Aucun spawner assigné !");
+        }
+        
+        if (weaponPickupPrefab == null)
+        {
+            Debug.LogError("[WeaponManager] Awake: Aucun prefab d'arme assigné !");
+        }
+        
+        if (availableWeapons.Count == 0)
+        {
+            Debug.LogWarning("[WeaponManager] Awake: Aucune arme disponible pour le spawn.");
+        }
+    }
     
     private void Start()
     {
-        // Trouver automatiquement le WrapAroundManager si non assigné
-        if (wrapAroundManager == null)
+        // Initialiser les spawners
+        foreach (WeaponSpawner spawner in spawners)
         {
-            wrapAroundManager = FindFirstObjectByType<WrapAroundManager>();
-            if (wrapAroundManager == null)
-            {
-                Debug.LogError("[WeaponManager] Start: Aucun WrapAroundManager trouvé dans la scène ! Veuillez l'assigner manuellement.");
-                return;
-            }
+            spawner.Initialize(this);
         }
         
-        // Vérifier si le prefab d'arme est assigné
-        if (weaponPickupPrefab == null)
-        {
-            Debug.LogError("[WeaponManager] Start: Aucun prefab d'arme assigné ! Veuillez assigner un prefab avec le composant WeaponPickup.");
-            return;
-        }
-        
-        // Vérifier si des armes sont disponibles
-        if (availableWeapons.Count == 0)
-        {
-            Debug.LogWarning("[WeaponManager] Start: Aucune arme disponible pour le spawn. Veuillez assigner des WeaponData.");
-            return;
-        }
-        
-        // Démarrer la coroutine de spawn d'armes
-        StartCoroutine(SpawnWeaponsRoutine());
+        // Lancer le spawn initial
+        StartCoroutine(InitialSpawnRoutine());
     }
     
-    private IEnumerator SpawnWeaponsRoutine()
+    private IEnumerator InitialSpawnRoutine()
     {
-        // Attendre que le WrapAroundManager soit initialisé
-        while (!wrapAroundManager.IsInitialized())
-        {
-            yield return new WaitForSeconds(0.5f);
-            Debug.Log("[WeaponManager] En attente de l'initialisation du WrapAroundManager...");
-        }
-        
-        while (true)
-        {
-            // Vérifier si on peut spawner une nouvelle arme
-            if (activeWeapons.Count < maxActiveWeapons)
-            {
-                SpawnWeapon();
-            }
-            
-            // Attendre un délai aléatoire avant le prochain spawn
-            float delay = Random.Range(minSpawnDelay, maxSpawnDelay);
-            yield return new WaitForSeconds(delay);
-        }
+        yield return new WaitForSeconds(initialSpawnDelay);
+        SpawnWeapons();
     }
     
-    private void SpawnWeapon()
+    private void SpawnWeapons()
     {
-        // Vérifier si le WrapAroundManager est initialisé
-        if (!wrapAroundManager.IsInitialized())
+        if (ActiveWeaponsCount >= maxActiveWeapons)
         {
-            Debug.LogWarning("[WeaponManager] SpawnWeapon: WrapAroundManager non initialisé. Impossible de spawner une arme.");
             return;
         }
         
-        // Obtenir les dimensions de la map
-        Vector2 mapMin = wrapAroundManager.MapMin;
-        Vector2 mapMax = wrapAroundManager.MapMax;
+        // Mélanger les spawners pour un spawn aléatoire
+        List<WeaponSpawner> availableSpawners = new List<WeaponSpawner>(spawners);
+        availableSpawners.Shuffle();
         
-        // Calculer une position aléatoire dans les limites de la map
-        float x = Random.Range(mapMin.x + borderOffset, mapMax.x - borderOffset);
-        float y = Random.Range(mapMin.y + borderOffset, mapMax.y - borderOffset);
-        Vector2 spawnPosition = new Vector2(x, y);
-        
-        // Sélectionner une arme aléatoire
-        WeaponData weaponData = availableWeapons[Random.Range(0, availableWeapons.Count)];
-        
-        // Instancier le prefab d'arme
-        GameObject weaponInstance = Instantiate(weaponPickupPrefab, spawnPosition, Quaternion.identity);
-        
-        // Configurer le WeaponPickup avec les données de l'arme
-        WeaponPickup weaponPickup = weaponInstance.GetComponent<WeaponPickup>();
-        if (weaponPickup != null)
+        int weaponsToSpawn = Mathf.Min(maxActiveWeapons - ActiveWeaponsCount, availableSpawners.Count);
+        for (int i = 0; i < weaponsToSpawn && availableWeapons.Count > 0; i++)
         {
-            weaponPickup.Initialize(weaponData, this);
+            WeaponData weaponData = availableWeapons[Random.Range(0, availableWeapons.Count)];
+            availableSpawners[i].SpawnWeapon(weaponData);
         }
-        else
-        {
-            Debug.LogError("[WeaponManager] SpawnWeapon: Le prefab d'arme ne contient pas de composant WeaponPickup !");
-            Destroy(weaponInstance);
-            return;
-        }
-        
-        // Ajouter l'arme à la liste des armes actives
-        activeWeapons.Add(weaponInstance);
-        
-        Debug.Log($"[WeaponManager] Arme '{weaponData.weaponName}' spawnée à la position {spawnPosition}");
     }
     
-    // Méthode appelée par WeaponPickup lorsqu'une arme est ramassée
     public void OnWeaponPickedUp(GameObject weaponObject)
     {
         if (activeWeapons.Contains(weaponObject))
         {
             activeWeapons.Remove(weaponObject);
             Debug.Log($"[WeaponManager] Arme ramassée. Armes actives restantes : {activeWeapons.Count}");
+        }
+    }
+    
+    public void RequestWeaponSpawn(WeaponSpawner spawner)
+    {
+        if (ActiveWeaponsCount < maxActiveWeapons && availableWeapons.Count > 0)
+        {
+            WeaponData weaponData = availableWeapons[Random.Range(0, availableWeapons.Count)];
+            spawner.SpawnWeapon(weaponData);
+            activeWeapons.Add(spawner.GetComponentInChildren<WeaponPickup>().gameObject);
+        }
+    }
+}
+
+// Extension pour mélanger une liste
+public static class ListExtensions
+{
+    public static void Shuffle<T>(this IList<T> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            T temp = list[i];
+            list[i] = list[j];
+            list[j] = temp;
         }
     }
 }

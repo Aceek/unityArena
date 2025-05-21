@@ -20,24 +20,17 @@ public class WeaponPickup : MonoBehaviour
     [Range(0.1f, 5f)]
     [SerializeField] private float floatFrequency = 1f;
     
-    // Données de l'arme
     private WeaponData weaponData;
-    
-    // Référence au WeaponManager
     private WeaponManager weaponManager;
-    
-    // Position initiale pour le mouvement de flottement
     private Vector3 initialPosition;
     
     private void Awake()
     {
-        // Récupérer le SpriteRenderer si non assigné
         if (spriteRenderer == null)
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
         }
         
-        // S'assurer que le GameObject a un Collider2D configuré comme trigger
         Collider2D collider = GetComponent<Collider2D>();
         if (collider != null)
         {
@@ -51,30 +44,25 @@ public class WeaponPickup : MonoBehaviour
     
     private void Start()
     {
-        // Enregistrer la position initiale pour le mouvement de flottement
         initialPosition = transform.position;
     }
     
     private void Update()
     {
-        // Faire tourner l'arme
         transform.Rotate(0, 0, rotationSpeed * Time.deltaTime);
-        
-        // Faire flotter l'arme
         float newY = initialPosition.y + Mathf.Sin(Time.time * floatFrequency) * floatAmplitude;
         transform.position = new Vector3(transform.position.x, newY, transform.position.z);
     }
     
-    // Initialiser le pickup avec les données de l'arme
     public void Initialize(WeaponData data, WeaponManager manager)
     {
         weaponData = data;
         weaponManager = manager;
         
-        // Configurer le sprite
         if (spriteRenderer != null && weaponData != null && weaponData.weaponSprite != null)
         {
             spriteRenderer.sprite = weaponData.weaponSprite;
+            spriteRenderer.transform.localScale = weaponData.weaponScale;
         }
         else
         {
@@ -82,26 +70,29 @@ public class WeaponPickup : MonoBehaviour
         }
     }
     
-    // Détecter quand un joueur entre en contact avec l'arme
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // Vérifier si c'est le joueur qui touche l'arme
         PlayerWeapon playerWeapon = other.GetComponent<PlayerWeapon>();
         if (playerWeapon != null && weaponData != null)
         {
-            // Équiper l'arme au joueur
             playerWeapon.EquipWeapon(weaponData);
+            Debug.Log($"[WeaponPickup] Arme '{weaponData.weaponName}' ramassée par le joueur");
             
-            // Notifier le WeaponManager que l'arme a été ramassée
+            // Notifier le WeaponSpawner parent
+            WeaponSpawner spawner = GetComponentInParent<WeaponSpawner>();
+            if (spawner != null)
+            {
+                spawner.OnWeaponPickedUp();
+            }
+            
+            // Notifier le WeaponManager
             if (weaponManager != null)
             {
                 weaponManager.OnWeaponPickedUp(gameObject);
             }
             
-            // Désactiver l'objet (plutôt que de le détruire pour une réutilisation potentielle)
+            // Désactiver l'objet
             gameObject.SetActive(false);
-            
-            Debug.Log($"[WeaponPickup] Arme '{weaponData.weaponName}' ramassée par le joueur");
         }
     }
 }
