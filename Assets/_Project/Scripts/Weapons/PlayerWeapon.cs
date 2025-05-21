@@ -13,9 +13,6 @@ public class PlayerWeapon : MonoBehaviour
     [SerializeField] private Camera mainCamera;
     
     [Header("Paramètres")]
-    [Tooltip("Position de l'arme par rapport au joueur")]
-    [SerializeField] private Vector3 weaponOffset = new Vector3(0.5f, 0f, 0f);
-    
     [Tooltip("Distance supplémentaire pour le spawn du projectile afin d'éviter les collisions immédiates")]
     [SerializeField] private float projectileSpawnDistance = 0.3f;
     
@@ -26,36 +23,26 @@ public class PlayerWeapon : MonoBehaviour
     [Tooltip("Référence à l'action d'attaque dans le Input System")]
     [SerializeField] private InputActionReference attackAction;
     
-    // Événements pour la communication avec d'autres composants
     [Header("Événements")]
     public UnityEvent<WeaponData> OnWeaponEquipped;
     public UnityEvent<float> OnWeaponTimerUpdated;
     public UnityEvent OnWeaponUnequipped;
     public UnityEvent OnWeaponAttack;
     
-    // Données de l'arme actuellement équipée
     private WeaponData equippedWeapon;
-    
-    // Timer pour la durée de l'arme
     private float weaponTimer;
-    
-    // Flag pour savoir si le joueur peut attaquer
     private bool canAttack = true;
     
-    // Propriété pour vérifier si le joueur a une arme équipée
     public bool HasWeapon => equippedWeapon != null;
-    
-    // Propriété pour accéder aux données de l'arme équipée
     public WeaponData EquippedWeapon => equippedWeapon;
     
     private void Awake()
     {
-        // Initialiser le SpriteRenderer de l'arme s'il n'est pas assigné
         if (weaponSpriteRenderer == null)
         {
             GameObject weaponObject = new GameObject("EquippedWeapon");
             weaponObject.transform.SetParent(transform);
-            weaponObject.transform.localPosition = weaponOffset;
+            weaponObject.transform.localPosition = Vector3.zero;
             
             weaponSpriteRenderer = weaponObject.AddComponent<SpriteRenderer>();
             weaponSpriteRenderer.sortingOrder = 1;
@@ -66,7 +53,6 @@ public class PlayerWeapon : MonoBehaviour
             weaponSpriteRenderer.enabled = false;
         }
         
-        // Trouver la caméra principale si non assignée
         if (mainCamera == null)
         {
             mainCamera = Camera.main;
@@ -115,7 +101,6 @@ public class PlayerWeapon : MonoBehaviour
                 UnequipWeapon();
             }
             
-            // Mettre à jour la rotation de l'arme pour suivre la visée
             UpdateWeaponRotation();
         }
     }
@@ -133,6 +118,8 @@ public class PlayerWeapon : MonoBehaviour
         if (weaponSpriteRenderer != null && weaponData.weaponSprite != null)
         {
             weaponSpriteRenderer.sprite = weaponData.weaponSprite;
+            weaponSpriteRenderer.transform.localScale = weaponData.weaponScale;
+            weaponSpriteRenderer.transform.localPosition = weaponData.weaponPositionOffset;
             weaponSpriteRenderer.enabled = true;
         }
         
@@ -232,21 +219,23 @@ public class PlayerWeapon : MonoBehaviour
             yield break;
         }
         
-        // Obtenir la direction de visée
         Vector2 direction = GetAimDirection();
         if (direction == Vector2.zero)
         {
-            // Si aucune direction (ex. joystick non utilisé), utiliser l'orientation du joueur
             direction = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
         }
         
-        // Calculer le point de spawn du projectile en fonction de la direction
-        Vector3 spawnPosition = transform.position + weaponOffset + (Vector3)(direction.normalized * projectileSpawnDistance);
+        // Vérifier si la direction de tir est opposée à l'orientation du personnage
+        if ((direction.x > 0 && transform.localScale.x < 0) || (direction.x < 0 && transform.localScale.x > 0))
+        {
+            transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+            Debug.Log($"[PlayerWeapon] Personnage retourné pour aligner avec la direction de tir: {direction}");
+        }
         
-        // Instancier le projectile
+        Vector3 spawnPosition = transform.position + equippedWeapon.weaponPositionOffset + (Vector3)(direction.normalized * projectileSpawnDistance);
+        
         GameObject projectile = Instantiate(equippedWeapon.projectilePrefab, spawnPosition, Quaternion.identity);
         
-        // Initialiser le projectile
         Projectile projectileScript = projectile.GetComponent<Projectile>();
         if (projectileScript != null)
         {
@@ -258,7 +247,6 @@ public class PlayerWeapon : MonoBehaviour
             Destroy(projectile);
         }
         
-        // Animation de recul
         Quaternion originalRotation = weaponSpriteRenderer.transform.localRotation;
         float recoilDuration = 0.1f;
         float elapsedTime = 0;
@@ -294,7 +282,6 @@ public class PlayerWeapon : MonoBehaviour
         
         Vector2 lookInput = movement.LookInput;
         
-        // Si l'input est de la souris
         if (Mouse.current != null && Mouse.current.position.ReadValue() != Vector2.zero)
         {
             Vector2 mousePosition = Mouse.current.position.ReadValue();
@@ -302,7 +289,6 @@ public class PlayerWeapon : MonoBehaviour
             return (worldPosition - transform.position).normalized;
         }
         
-        // Sinon, utiliser l'input du joystick
         return lookInput.normalized;
     }
     
@@ -316,6 +302,12 @@ public class PlayerWeapon : MonoBehaviour
         {
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             weaponSpriteRenderer.transform.localRotation = Quaternion.Euler(0, 0, angle);
+            Vector3 position = equippedWeapon.weaponPositionOffset;
+            if (transform.localScale.x < 0)
+            {
+                position.x = -position.x;
+            }
+            weaponSpriteRenderer.transform.localPosition = position;
         }
     }
     
@@ -325,6 +317,8 @@ public class PlayerWeapon : MonoBehaviour
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, equippedWeapon.attackRange);
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(transform.position + equippedWeapon.weaponPositionOffset, 0.1f);
         }
     }
 }

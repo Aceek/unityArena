@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: Pistol
   m_EditorClassIdentifier: 
   weaponName: Pistolet
-  description: "Un pistolet \xE0 tir rapide"
-  weaponSprite: {fileID: 1672666347, guid: f1776fb170faca04c9a2fd36726073a6, type: 3}
-  duration: 20.1
   weaponType: 1
+  weaponSprite: {fileID: 1672666347, guid: f1776fb170faca04c9a2fd36726073a6, type: 3}
   damage: 5
   attackRange: 0
-  attackSpeed: 5
+  duration: 20.1
   projectilePrefab: {fileID: 3511691334144219128, guid: 19858471bb704cc46b4e38f3ea9c413a, type: 3}
   projectileSpeed: 15
+  weaponScale: {x: 0.3, y: 0.3, z: 1}
+  weaponPositionOffset: {x: 0.5, y: 0, z: 0}

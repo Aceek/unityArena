@@ -13,10 +13,12 @@ MonoBehaviour:
   m_Name: MeleeWeapon
   m_EditorClassIdentifier: 
   weaponName: Sword
-  description: Melee weapon
-  weaponSprite: {fileID: 1202779978705543583, guid: 1dd058018c4194147abbd8b02b53e9ff, type: 3}
-  duration: 30
   weaponType: 0
+  weaponSprite: {fileID: 1202779978705543583, guid: 1dd058018c4194147abbd8b02b53e9ff, type: 3}
   damage: 10
   attackRange: 1.5
-  attackSpeed: 1
+  duration: 30
+  projectilePrefab: {fileID: 0}
+  projectileSpeed: 10
+  weaponScale: {x: 0.7, y: 0.7, z: 1}
+  weaponPositionOffset: {x: 1, y: 0, z: 0}
